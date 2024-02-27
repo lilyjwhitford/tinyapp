@@ -16,5 +16,8 @@
   "bugs": {
     "url": "https://github.com/lilyjwhitford/tinyapp/issues"
   },
-  "homepage": "https://github.com/lilyjwhitford/tinyapp#readme"
+  "homepage": "https://github.com/lilyjwhitford/tinyapp#readme",
+  "dependencies": {
+    "express": "^4.18.2"
+  }
 }
