@@ -58,3 +58,14 @@ app.post("/urls", (req, res) => { // making POST request to /urls
   console.log(req.body); // log the post request body to the console
   res.redirect(`/urls/${id}`); // respond with redirect to /urls/id
 });
+
+app.get("/u/:id", (req, res) => {
+  const id = req.params.id; // extract the id from request parameters
+  const longURL = urlDatabase[id]; // fetch longURL associated with id from urlDatabase
+
+  if (longURL) {
+    res.redirect(302, longURL); // use 302 status code for (found)
+  } else {
+    res.status(404).send("404 Error: Not found"); // if id doesnt exist in urlDatabase, send 404 status code (error)
+  }
+});
