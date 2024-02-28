@@ -51,7 +51,7 @@ function generateRandomString() {
   let result = "";
   const charactersLength = alphaNumericChars.length;
   for (let i = 0; i < 6; i++) {
-    result += alphaNumericChars.charAt(Math.floor(Math.random() * charactersLength))''
+    result += alphaNumericChars.charAt(Math.floor(Math.random() * charactersLength));
   }
   return result;
 };
