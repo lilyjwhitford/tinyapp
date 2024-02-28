@@ -51,8 +51,10 @@ app.get("/urls/:id", (req, res) => {
   res.render("urls_show", templateVars); // render the urls_show template
 });
 
-app.post("/urls", (req, res) => {
-  const randomString = generateRandomString();
+app.post("/urls", (req, res) => { // making POST request to /urls
+  const id = generateRandomString(); // generating random short URL/id 
+  const longURL = req.body.longURL; // grab longURL from form input
+  urlDatabase[id] = longURL; // save id-longURL to urlDatabse when it recieves POST request to "/urls"
   console.log(req.body); // log the post request body to the console
-  res.send(randomString); // respond with random string
+  res.redirect(`/urls/${id}`); // respond with redirect to /urls/id
 });
