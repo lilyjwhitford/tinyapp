@@ -11,12 +11,12 @@ const urlDatabase = {
   "9sm5xK": "http://www.google.com"
 };
 
-const alphaNumericChars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+const possibleChars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
 function generateRandomString() {
   let result = "";
-  const charactersLength = alphaNumericChars.length;
+  const charactersLength = possibleChars.length;
   for (let i = 0; i < 6; i++) {
-    result += alphaNumericChars.charAt(Math.floor(Math.random() * charactersLength));
+    result += possibleChars.charAt(Math.floor(Math.random() * charactersLength));
   }
   return result;
 };
@@ -55,7 +55,6 @@ app.post("/urls", (req, res) => { // making POST request to /urls
   const id = generateRandomString(); // generating random short URL/id 
   const longURL = req.body.longURL; // grab longURL from form input
   urlDatabase[id] = longURL; // save id-longURL to urlDatabse when it recieves POST request to "/urls"
-  console.log(req.body); // log the post request body to the console
   res.redirect(`/urls/${id}`); // respond with redirect to /urls/id
 });
 
