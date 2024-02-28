@@ -30,6 +30,10 @@ app.get("/urls", (req, res) => {
   res.render("urls_index", templateVars);
 });
 
+app.get("/urls/new", (req, res) => {
+  res.render("urls_new");
+});
+
 app.get("/urls/:id", (req, res) => {
  const id = req.params.id; // access the id parameter from the route
  const longURL = urlDatabase[id]; // look up the longURL using the id
