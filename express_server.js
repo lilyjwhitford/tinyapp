@@ -35,8 +35,6 @@ app.get("/urls/new", (req, res) => {
 });
 
 app.get("/urls/:id", (req, res) => {
- const id = req.params.id; // access the id parameter from the route
- const longURL = urlDatabase[id]; // look up the longURL using the id
- const templateVars = { id: id, longURL: longURL }; // pass both values to the template
+ const templateVars = { id: req.params.id, longURL: urlDatabase[req.params.id] }; // pass both values to the template
  res.render("urls_show", templateVars); // render the urls_show template
 });
