@@ -11,6 +11,16 @@ const urlDatabase = {
   "9sm5xK": "http://www.google.com"
 };
 
+const alphaNumericChars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+function generateRandomString() {
+  let result = "";
+  const charactersLength = alphaNumericChars.length;
+  for (let i = 0; i < 6; i++) {
+    result += alphaNumericChars.charAt(Math.floor(Math.random() * charactersLength));
+  }
+  return result;
+};
+
 app.get("/", (req, res) => {
   res.send("Hello!");
 });
@@ -42,16 +52,7 @@ app.get("/urls/:id", (req, res) => {
 });
 
 app.post("/urls", (req, res) => {
+  const randomString = generateRandomString();
   console.log(req.body); // log the post request body to the console
-  res.send("ok"); // respond with ok 
+  res.send(randomString); // respond with random string
 });
-
-const alphaNumericChars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-function generateRandomString() {
-  let result = "";
-  const charactersLength = alphaNumericChars.length;
-  for (let i = 0; i < 6; i++) {
-    result += alphaNumericChars.charAt(Math.floor(Math.random() * charactersLength));
-  }
-  return result;
-};
