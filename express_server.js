@@ -73,4 +73,14 @@ app.post("/urls/:id/delete", (req, res) => {
   const id = req.params.id; // extract the id from request parameters
   delete urlDatabase[id]; // remove the URL from the urlDatabase using delete operator
   res.redirect("/urls") // once its been deleted, redirect back to "/urls"
-})
+});
+
+app.post("/urls/:id", (req, res) => {
+  const id = req.params.id;
+  const newLongURL = req.body.longURL;
+
+  if (urlDatabase[id]) {
+    urlDatabase[id] = newLongURL;
+    res.redirect("/urls");
+  }
+});
