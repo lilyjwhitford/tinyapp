@@ -68,3 +68,9 @@ app.get("/u/:id", (req, res) => {
     res.status(404).send("404 Error: Not found"); // if id doesnt exist in urlDatabase, send 404 status code (error)
   }
 });
+
+app.post("/urls/:id/delete", (req, res) => {
+  const id = req.params.id; // extract the id from request parameters
+  delete urlDatabase[id]; // remove the URL from the urlDatabase using delete operator
+  res.redirect("/urls") // once its been deleted, redirect back to "/urls"
+})
