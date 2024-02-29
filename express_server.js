@@ -86,3 +86,9 @@ app.post("/urls/:id", (req, res) => {
     res.status(404).send("404 Error: URL not found"); // if shortURL doesnt exist, send status code 404
   }
 });
+
+app.post("/login", (req, res) => {
+  const username = req.body.username; // set cookie "username" to value submitted in request body
+  res.cookie("username", username);
+  res.redirect("/urls"); // redirect back to "/urls"
+});
