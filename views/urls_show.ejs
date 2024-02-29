@@ -20,7 +20,16 @@
           Short URL ID: <a href="/u/<%= id %>"><%= id %></a>
         </p>
         <!-- link for creating a new URL -->
-        <a href="#" class="btn btn-primary">Create a new URL</a>
+        <form method="POST" action="/urls/<%= id%>">
+          <div class="form-group">
+            <div class="header">
+              <h2>Edit</h2>
+            </div>
+            <label for="longURL" class="form-label">New URL:</label>
+            <input type="text" class="form-control" id="longURL" name="longURL" placeholder="Enter new URL">
+            <button type="submit" class="btn btn-primary">Submit</button>
+          </div>
+        </form>
       </div>
       <div class="card-footer text-muted"></div>
     </div>
