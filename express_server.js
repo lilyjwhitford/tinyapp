@@ -62,10 +62,10 @@ app.get("/u/:id", (req, res) => {
   const id = req.params.id; // extract the id from request parameters
   const longURL = urlDatabase[id]; // fetch longURL associated with id from urlDatabase
 
-  if (longURL) {
-    res.redirect(302, longURL); // use 302 status code for (found)
+  if (longURL) { // check if longURL exists in urlDatabase
+    res.redirect(302, longURL); // if it does exist, redirect to longURL using status code 302 (found)
   } else {
-    res.status(404).send("404 Error: URL not found"); // if id doesnt exist in urlDatabase, send 404 status code (error)
+    res.status(404).send("404 Error: URL not found"); // if longURL doesnt exist in urlDatabase, send 404 status code (error)
   }
 });
 
@@ -77,10 +77,12 @@ app.post("/urls/:id/delete", (req, res) => {
 
 app.post("/urls/:id", (req, res) => {
   const id = req.params.id;
-  const newLongURL = req.body.longURL;
+  const newLongURL = req.body.longURL; 
 
-  if (urlDatabase[id]) {
-    urlDatabase[id] = newLongURL;
-    res.redirect("/urls");
+  if (urlDatabase[id]) { // check if shortURL id exists in database
+    urlDatabase[id] = newLongURL; // update longURL in database
+    res.redirect("/urls"); // redirect back to "/urls"
+  } else {
+    res.status(404).send("404 Error: URL not found"); // if shortURL doesnt exist, send status code 404
   }
 });
