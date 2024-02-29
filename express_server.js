@@ -4,7 +4,7 @@ const PORT = 8080; // default port 8080
 
 app.use(express.urlencoded({ extended: true }));
 
-app.set('view engine', 'ejs'); 
+app.set('view engine', 'ejs');
 
 const urlDatabase = {
   "b2xVn2": "http://www.lighthouselabs.ca",
@@ -12,7 +12,7 @@ const urlDatabase = {
 };
 
 const possibleChars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-function generateRandomString() {
+const generateRandomString = function() {
   let result = "";
   const charactersLength = possibleChars.length;
   for (let i = 0; i < 6; i++) {
@@ -35,7 +35,7 @@ app.get("/urls.json", (req, res) => {
 
 app.get("/hello", (req, res) => {
   res.send("<html><body>Hello <b>World</b></body></html>\n");
-}); 
+});
 
 app.get("/urls", (req, res) => {
   const templateVars = { urls: urlDatabase };
@@ -52,7 +52,7 @@ app.get("/urls/:id", (req, res) => {
 });
 
 app.post("/urls", (req, res) => { // making POST request to /urls
-  const id = generateRandomString(); // generating random short URL/id 
+  const id = generateRandomString(); // generating random short URL/id
   const longURL = req.body.longURL; // grab longURL from form input
   urlDatabase[id] = longURL; // save id-longURL to urlDatabse when it recieves POST request to "/urls"
   res.redirect(`/urls/${id}`); // respond with redirect to /urls/id
@@ -65,14 +65,14 @@ app.get("/u/:id", (req, res) => {
   if (longURL) {
     res.redirect(302, longURL); // use 302 status code for (found)
   } else {
-    res.status(404).send("404 Error: Not found"); // if id doesnt exist in urlDatabase, send 404 status code (error)
+    res.status(404).send("404 Error: URL not found"); // if id doesnt exist in urlDatabase, send 404 status code (error)
   }
 });
 
 app.post("/urls/:id/delete", (req, res) => {
   const id = req.params.id; // extract the id from request parameters
   delete urlDatabase[id]; // remove the URL from the urlDatabase using delete operator
-  res.redirect("/urls") // once its been deleted, redirect back to "/urls"
+  res.redirect("/urls"); // once its been deleted, redirect back to "/urls"
 });
 
 app.post("/urls/:id", (req, res) => {
