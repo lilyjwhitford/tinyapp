@@ -109,3 +109,10 @@ app.post("/logout", (req, res) => {
   res.clearCookie("username"); // clear "username" cookie to log user out
   res.redirect("/urls"); // redirect user to home/login page
 });
+
+app.get("/register", (req, res) => {
+  const templateVars = {
+    username: req.cookies["username"]
+  };
+  res.render("register", templateVars);
+});
