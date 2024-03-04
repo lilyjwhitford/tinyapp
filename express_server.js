@@ -13,8 +13,21 @@ const urlDatabase = {
   "9sm5xK": "http://www.google.com"
 };
 
-const possibleChars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+const users = {
+  userRandomID: {
+    id: "userRandomID",
+    email: "user@example.com",
+    password: "purple-monkey-dinosaur",
+  },
+  user2RandomID: {
+    id: "user2RandomID",
+    email: "user2@example.com",
+    password: "dishwasher-funk",
+  },
+};
+
 const generateRandomString = function() {
+  const possibleChars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
   let result = "";
   const charactersLength = possibleChars.length;
   for (let i = 0; i < 6; i++) {
@@ -115,4 +128,16 @@ app.get("/register", (req, res) => {
     username: req.cookies["username"]
   };
   res.render("register", templateVars);
+});
+
+app.post("/register", (req, res) => {
+  const userId = generateRandomString(); // generate random userID
+  const newUser = { // extract email and password from req.body
+    id: userId,
+    email: req.body.email,
+    password: req.body.password,
+  };
+  users[userId] = newUser; // add new user to users object
+  res.cookie("user_id", userId); // set user_id cookie
+  res.redirect("/urls"); // redirect to /urls page
 });
