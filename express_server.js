@@ -125,9 +125,15 @@ app.post("/urls/:id", (req, res) => {
 });
 
 app.post("/login", (req, res) => {
-  const username = req.body.username; // set cookie "username" to value submitted in request body
-  res.cookie("username", username);
+  const email = req.body.email;
+  const password = req.body.password;
+  const user = findUserByEmail(email);
+  if (user && user.password === password) {
+  res.cookie("user_id", user.id);
   res.redirect("/urls"); // redirect user to home/login page
+  } else {
+    res.redirect("/login?error=invalid");
+  }
 });
 
 app.post("/logout", (req, res) => {
@@ -163,4 +169,12 @@ app.post("/register", (req, res) => {
   
   res.cookie("user_id", userId); // set user_id cookie
   res.redirect("/urls"); // redirect to /urls page
+});
+
+app.get("/login", (req, res) => {
+  const user = users[req.cookies["user_id"]];
+  const templateVars = {
+  user: user
+  };
+  res.render("login", templateVars);
 });
