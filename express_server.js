@@ -148,10 +148,10 @@ app.post("/register", (req, res) => {
   const password = req.body.password;
   const existingUser = findUserByEmail(email);
   if (email === "" || password === "") {
-    return res.status(404).send("404 Error: E-mail/Password cannot be empty");
+    return res.status(400).send("400 Error: E-mail/Password cannot be empty");
   } // if password/email fields are empty, return 404 status code
   if (existingUser) {
-    return res.status(404).send("404 Error: Email already in use");
+    return res.status(400).send("400 Error: Email already in use");
   } // if email is already in use, return 404 status code
   const userId = generateRandomString(); // generate random userID
   const newUser = { // extract email and password from req.body
