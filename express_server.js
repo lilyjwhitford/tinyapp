@@ -17,13 +17,22 @@ const users = {
   userRandomID: {
     id: "userRandomID",
     email: "user@example.com",
-    password: "purple-monkey-dinosaur",
+    password: "purple-monkey-dinosaur"
   },
   user2RandomID: {
     id: "user2RandomID",
     email: "user2@example.com",
-    password: "dishwasher-funk",
+    password: "dishwasher-funk"
   },
+};
+
+const findUserByEmail = function(email) { // helper function that takes in email 
+  for (let userId in users) {
+    if (users[userId].email === email) {
+      return users[userId] // returns the entire user object
+    }
+  }
+  return null; // returns null if not found
 };
 
 const generateRandomString = function() {
@@ -91,9 +100,9 @@ app.get("/u/:id", (req, res) => {
   const longURL = urlDatabase[id]; // fetch longURL associated with id from urlDatabase
 
   if (longURL) { // check if longURL exists in urlDatabase
-    res.redirect(302, longURL); // if it does exist, redirect to longURL using status code 302 (found)
+    return res.redirect(302, longURL); // if it does exist, redirect to longURL using status code 302 (found)
   } else {
-    res.status(404).send("404 Error: URL not found"); // if longURL doesnt exist in urlDatabase, send 404 status code (error)
+    return res.status(404).send("404 Error: URL not found"); // if longURL doesnt exist in urlDatabase, send 404 status code
   }
 });
 
@@ -109,9 +118,9 @@ app.post("/urls/:id", (req, res) => {
 
   if (urlDatabase[id]) { // check if shortURL id exists in database
     urlDatabase[id] = newLongURL; // update longURL in database
-    res.redirect("/urls"); // redirect user back to "/urls"
+    return res.redirect("/urls"); // redirect user back to "/urls"
   } else {
-    res.status(404).send("404 Error: URL not found"); // if shortURL doesnt exist, send status code 404
+    return res.status(404).send("404 Error: URL not found"); // if shortURL doesnt exist, 404 status code
   }
 });
 
@@ -135,13 +144,23 @@ app.get("/register", (req, res) => {
 });
 
 app.post("/register", (req, res) => {
+  const email = req.body.email;
+  const password = req.body.password;
+  const existingUser = findUserByEmail(email);
+  if (email === "" || password === "") {
+    return res.status(404).send("404 Error: E-mail/Password cannot be empty");
+  } // if password/email fields are empty, return 404 status code
+  if (existingUser) {
+    return res.status(404).send("404 Error: Email already in use");
+  } // if email is already in use, return 404 status code
   const userId = generateRandomString(); // generate random userID
   const newUser = { // extract email and password from req.body
     id: userId,
     email: req.body.email,
-    password: req.body.password,
+    password: req.body.password
   };
   users[userId] = newUser; // add new user to users object
+  
   res.cookie("user_id", userId); // set user_id cookie
   res.redirect("/urls"); // redirect to /urls page
 });
