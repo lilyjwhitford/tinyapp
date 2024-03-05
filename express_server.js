@@ -142,8 +142,8 @@ app.post("/login", (req, res) => {
 });
 
 app.post("/logout", (req, res) => {
-  res.clearCookie("user_id"); // clear "username" cookie to log user out
-  res.redirect("/urls"); // redirect user to home/login page
+  res.clearCookie("user_id"); // clear "user_id" cookie to log user out
+  res.redirect("/login"); // redirect user to home/login page
 });
 
 app.get("/register", (req, res) => {
