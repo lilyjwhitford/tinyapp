@@ -130,10 +130,10 @@ app.post("/login", (req, res) => {
   const password = req.body.password;
   const user = findUserByEmail(email);
   if (!user) {
-    return res.status(403).send("403 Error: E-mail cannot be found");
+    return res.status(403).send("403 Error: E-mail/Password cannot be found");
   }
   if (user && user.password !== password) {
-    return res.status(403).send("403 Error: E-mail and Password does not match");
+    return res.status(403).send("403 Error: E-mail and Password do not match");
   }
   if (user && user.password === password) {
     res.cookie("user_id", user.id);
