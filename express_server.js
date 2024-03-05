@@ -1,5 +1,6 @@
 const express = require("express");
-
+const { findUserByEmail, generateRandomString } = require("./helperFuncs");
+const { urlDatabase, users } = require("./data");
 
 const app = express();
 const PORT = 8080; // default port 8080
@@ -9,47 +10,6 @@ const cookieParser = require("cookie-parser");
 app.use(cookieParser());
 app.set('view engine', 'ejs');
 
-const urlDatabase = {
-  "b2xVn2": "http://www.lighthouselabs.ca",
-  "9sm5xK": "http://www.google.com"
-};
-
-const users = {
-  userRandomID: {
-    id: "userRandomID",
-    email: "user@example.com",
-    password: "purple-monkey-dinosaur"
-  },
-  user2RandomID: {
-    id: "user2RandomID",
-    email: "user2@example.com",
-    password: "dishwasher-funk"
-  },
-};
-
-const findUserByEmail = function(email) { // helper function that takes in email 
-  for (let userId in users) {
-    if (users[userId].email === email) {
-      return users[userId] // returns the entire user object
-    }
-  }
-  return null; // returns null if not found
-};
-
-const generateRandomString = function() {
-  const possibleChars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-  let result = "";
-  const charactersLength = possibleChars.length;
-  for (let i = 0; i < 6; i++) {
-    result += possibleChars.charAt(Math.floor(Math.random() * charactersLength));
-  }
-  return result;
-};
-
-// app.get("/", (req, res) => {
-//   res.send("Hello!");
-// });
-
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}!`);
 });
@@ -57,10 +17,6 @@ app.listen(PORT, () => {
 app.get("/urls.json", (req, res) => {
   res.json(urlDatabase);
 });
-
-// app.get("/hello", (req, res) => {
-//   res.send("<html><body>Hello <b>World</b></body></html>\n");
-// });
 
 app.get("/urls", (req, res) => {
   const user = users[req.cookies["user_id"]]; // lookup user object using user_id cookie value
