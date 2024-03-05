@@ -1,11 +1,12 @@
 const express = require("express");
+
+
 const app = express();
 const PORT = 8080; // default port 8080
 
 app.use(express.urlencoded({ extended: true }));
 const cookieParser = require("cookie-parser");
 app.use(cookieParser());
-
 app.set('view engine', 'ejs');
 
 const urlDatabase = {
@@ -128,11 +129,15 @@ app.post("/login", (req, res) => {
   const email = req.body.email;
   const password = req.body.password;
   const user = findUserByEmail(email);
+  if (!user) {
+    return res.status(403).send("403 Error: E-mail cannot be found");
+  }
+  if (user && user.password !== password) {
+    return res.status(403).send("403 Error: E-mail and Password does not match");
+  }
   if (user && user.password === password) {
-  res.cookie("user_id", user.id);
-  res.redirect("/urls"); // redirect user to home/login page
-  } else {
-    res.redirect("/login?error=invalid");
+    res.cookie("user_id", user.id);
+    return res.redirect("/urls"); // redirect user to home/login page
   }
 });
 
@@ -157,7 +162,7 @@ app.post("/register", (req, res) => {
     return res.status(400).send("400 Error: E-mail/Password cannot be empty");
   } // if password/email fields are empty, return 404 status code
   if (existingUser) {
-    return res.status(400).send("400 Error: Email already in use");
+    return res.status(400).send("400 Error: E-mail already in use");
   } // if email is already in use, return 404 status code
   const userId = generateRandomString(); // generate random userID
   const newUser = { // extract email and password from req.body
