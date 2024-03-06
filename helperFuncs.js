@@ -41,14 +41,33 @@ const checkIfNotLoggedIn = function(req, res, next) {
   }
 };
 
-// helper function to check if user is logged in 
+// helper function to check if user is logged in to POST and returns approproate message
 const checkIfNotLoggedInForPost = function(req, res, next) {
   const user = users[req.cookies["user_id"]];
   if (user) { // if user is logged proceed to next route handler
     next();
-  } else { // if user is not logged in send HTML message telling the user why
-    return res.send(`<h1>You must be logged in to shorten URLs</h1>`);
+  } else { // if user is not logged in send HTML message telling the user to login/register
+    return res.send(`<html><body><p>You must be logged in to shorten URLs. Please <a href="/login">login</a> or <a href="/register">register.</a></p></body></html>`);
   }
 };
 
-module.exports = { findUserByEmail, generateRandomString, checkIfLoggedIn, checkIfNotLoggedIn, checkIfNotLoggedInForPost };
+const checkIfNotLoggedInForGet = function(req, res, next) {
+  const user = users[req.cookies["user_id"]];
+  if (user) { // if user is logged proceed to next route handler
+    next();
+  } else { // if user is not logged in send HTML message telling the to login/register
+    return res.send(`<html><body><p>You must be logged in to view shortened URLs. Please <a href="/login">login</a> or <a href="/register">register.</a></p></body></html>`);
+  }
+};
+
+// const urlsForUser(id) {
+
+// }
+
+module.exports = { 
+  findUserByEmail, 
+  generateRandomString, 
+  checkIfLoggedIn, 
+  checkIfNotLoggedIn, 
+  checkIfNotLoggedInForPost,
+  checkIfNotLoggedInForGet };
