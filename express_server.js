@@ -36,7 +36,7 @@ app.get("/urls/new",checkIfNotLoggedIn, (req, res) => {
   res.render("urls_new", templateVars);
 });
 
-app.get("/urls/:id", checkIfNotLoggedInId, checkUrlOwnership, (req, res) => {
+app.get("/urls/:id", (req, res) => {
   const user = users[req.cookies["user_id"]];
   const templateVars = { 
     id: req.params.id, 
@@ -61,17 +61,23 @@ app.get("/u/:id", (req, res) => {
   if (longURL) { // check if longURL exists in urlDatabase
     return res.redirect(302, longURL); // if it does exist, redirect to longURL using status code 302 (found)
   } else {
-    return res.status(404).send(`<h1>Error 404: URL Not Found</h1>`); // if longURL doesnt exist in urlDatabase, send 404 status code
+    return res.status(404).send("Error 404: URL Not Found"); // if longURL doesnt exist in urlDatabase, send 404 status code
   }
 });
 
-app.post("/urls/:id/delete", (req, res) => {
+app.post("/urls/:id/delete", checkIfNotLoggedInId, checkUrlOwnership, (req, res) => {
   const id = req.params.id; // extract the id from request parameters
-  delete urlDatabase[id]; // remove the URL from the urlDatabase using delete operator
-  res.redirect("/urls"); // once its been deleted, redirect back to "/urls"
+  delete urlDatabase[id];
+
+  if (urlInfo) {
+    delete urlDatabase[id]; // remove the URL from the urlDatabase using delete operator
+    return res.redirect("/urls"); // once its deleted. redirect user back to "/urls"
+  } else {
+    return res.status(404).send(`<h1>Error 404: URL Not Found</h1>`)
+  } // once its been deleted, redirect back to "/urls"
 });
 
-app.post("/urls/:id", (req, res) => {
+app.post("/urls/:id", checkIfNotLoggedInId, checkUrlOwnership, (req, res) => {
   const id = req.params.id;
   const newLongURL = req.body.longURL; 
 
@@ -79,7 +85,7 @@ app.post("/urls/:id", (req, res) => {
     urlDatabase[id].longURL = newLongURL; // update longURL in database
     return res.redirect("/urls"); // redirect user back to "/urls"
   } else {
-    return res.status(404).send("404 Error: URL not found"); // if shortURL doesnt exist, 404 status code
+    return res.status(404).send(`<h1>Error 404: URL Not Found</h1>`); // if shortURL doesnt exist, 404 status code
   }
 });
 
