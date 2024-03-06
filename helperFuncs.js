@@ -1,4 +1,4 @@
-const { users } = require("./data");
+const { users, urlDatabase } = require("./data");
 
 // helper function to find user by email
 const findUserByEmail = function(email) { // helper function that takes in email 
@@ -60,9 +60,16 @@ const checkIfNotLoggedInForGet = function(req, res, next) {
   }
 };
 
-// const urlsForUser(id) {
-
-// }
+// helper function that returns URL where userID is equal to the if of user
+const urlsForUser = function(id){
+  const userUrls = [];
+  for (let shortURL in urlDatabase) {
+    if (urlDatabase[shortURL].userId === id) {
+      userUrls.push(urlDatabase[shortURL].longURL)
+    }
+  }
+  return userUrls;
+};
 
 module.exports = { 
   findUserByEmail, 
@@ -70,4 +77,5 @@ module.exports = {
   checkIfLoggedIn, 
   checkIfNotLoggedIn, 
   checkIfNotLoggedInForPost,
-  checkIfNotLoggedInForGet };
+  checkIfNotLoggedInForGet,
+  urlsForUser };
