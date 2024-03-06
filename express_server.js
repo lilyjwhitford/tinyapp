@@ -1,4 +1,5 @@
 const express = require("express");
+const bcrypt = require("bcryptjs");
 const { findUserByEmail, generateRandomString, checkIfLoggedIn, checkIfNotLoggedIn, checkIfNotLoggedInForPost, checkIfNotLoggedInForGet, urlsForUser, checkIfNotLoggedInId, checkUrlOwnership } = require("./helperFuncs");
 const { urlDatabase, users } = require("./data");
 
@@ -96,13 +97,14 @@ app.post("/login", (req, res) => {
   if (!user) {
     return res.status(403).send("403 Error: E-mail/Password cannot be found");
   }
-  if (user && user.password !== password) {
+  const isValidPassword = bcrypt.compareSync(password, user.password); // compare password with hashed password
+
+  if (!isValidPassword) { // check if password is correct
     return res.status(403).send("403 Error: E-mail and Password do not match");
   }
-  if (user && user.password === password) {
-    res.cookie("user_id", user.id);
-    return res.redirect("/urls"); // redirect user to home/login page
-  }
+  
+  res.cookie("user_id", user.id); // if password is correct, proceed with login
+  return res.redirect("/urls"); // redirect user to home/login page
 });
 
 app.post("/logout", (req, res) => {
@@ -121,6 +123,7 @@ app.get("/register", checkIfLoggedIn, (req, res) => {
 app.post("/register", (req, res) => {
   const email = req.body.email;
   const password = req.body.password;
+  const hashedPassword = bcrypt.hashSync(password, 10);
   const existingUser = findUserByEmail(email);
   if (email === "" || password === "") {
     return res.status(400).send("400 Error: E-mail/Password cannot be empty");
@@ -132,7 +135,7 @@ app.post("/register", (req, res) => {
   const newUser = { // extract email and password from req.body
     id: userId,
     email: req.body.email,
-    password: req.body.password
+    password: hashedPassword // store hashed password
   };
   users[userId] = newUser; // add new user to users object
   
