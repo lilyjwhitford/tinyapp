@@ -1,5 +1,5 @@
 const express = require("express");
-const { findUserByEmail, generateRandomString, checkIfLoggedIn, checkIfNotLoggedIn, checkIfNotLoggedInForPost, checkIfNotLoggedInForGet, urlsForUser } = require("./helperFuncs");
+const { findUserByEmail, generateRandomString, checkIfLoggedIn, checkIfNotLoggedIn, checkIfNotLoggedInForPost, checkIfNotLoggedInForGet, urlsForUser, checkIfNotLoggedInId, checkUrlOwnership } = require("./helperFuncs");
 const { urlDatabase, users } = require("./data");
 
 const app = express();
@@ -36,7 +36,7 @@ app.get("/urls/new",checkIfNotLoggedIn, (req, res) => {
   res.render("urls_new", templateVars);
 });
 
-app.get("/urls/:id", (req, res) => {
+app.get("/urls/:id", checkIfNotLoggedInId, checkUrlOwnership, (req, res) => {
   const user = users[req.cookies["user_id"]];
   const templateVars = { 
     id: req.params.id, 
@@ -49,8 +49,8 @@ app.get("/urls/:id", (req, res) => {
 app.post("/urls", checkIfNotLoggedInForPost, (req, res) => { // making POST request to /urls
   const id = generateRandomString(); // generating random short URL/id
   const longURL = req.body.longURL; // grab longURL from form input
-  const userID = req.cookies["user_id"]; // 
-  urlDatabase[id] = { longURL, userID }; // save id-longURL to urlDatabse when it recieves POST request to "/urls"
+  const userId = req.cookies["user_id"]; // 
+  urlDatabase[id] = { longURL, userId }; // save id-longURL to urlDatabse when it recieves POST request to "/urls"
   res.redirect(`/urls/${id}`); // respond with redirect to /urls/id
 });
 
