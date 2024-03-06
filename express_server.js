@@ -1,5 +1,5 @@
 const express = require("express");
-const { findUserByEmail, generateRandomString, checkIfLoggedIn, checkIfNotLoggedIn, checkIfNotLoggedInForPost, checkIfNotLoggedInForGet } = require("./helperFuncs");
+const { findUserByEmail, generateRandomString, checkIfLoggedIn, checkIfNotLoggedIn, checkIfNotLoggedInForPost, checkIfNotLoggedInForGet, urlsForUser } = require("./helperFuncs");
 const { urlDatabase, users } = require("./data");
 
 const app = express();
@@ -20,11 +20,12 @@ app.get("/urls.json", (req, res) => {
 
 app.get("/urls", checkIfNotLoggedInForGet, (req, res) => {
   const user = users[req.cookies["user_id"]]; // lookup user object using user_id cookie value
+  const userUrls = urlsForUser(user.id); // use the users id from the cookie to filter URLS for the logged-in user
   const templateVars = {
-    urls: urlDatabase,
+    urls: userUrls, // pass filteres URLS to template
     user: user // pass entire user object via templateVars
   };
-  res.render("urls_index", templateVars);
+  res.render("urls_index", templateVars); // render urls_index template with provided template vars
 });
 
 app.get("/urls/new",checkIfNotLoggedIn, (req, res) => {
