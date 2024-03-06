@@ -59,7 +59,7 @@ app.get("/u/:id", (req, res) => {
   if (longURL) { // check if longURL exists in urlDatabase
     return res.redirect(302, longURL); // if it does exist, redirect to longURL using status code 302 (found)
   } else {
-    return res.status(404).send("404 Error: URL not found"); // if longURL doesnt exist in urlDatabase, send 404 status code
+    return res.status(404).send(`<h1>Error 404: URL Not Found</h1>`); // if longURL doesnt exist in urlDatabase, send 404 status code
   }
 });
 
