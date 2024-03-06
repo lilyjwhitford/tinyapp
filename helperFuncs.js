@@ -1,5 +1,6 @@
 const { users } = require("./data");
 
+// helper function to find user by email
 const findUserByEmail = function(email) { // helper function that takes in email 
   for (let userId in users) {
     if (users[userId].email === email) {
@@ -9,6 +10,7 @@ const findUserByEmail = function(email) { // helper function that takes in email
   return null; // returns null if not found
 };
 
+// helper function to generate random strings
 const generateRandomString = function() {
   const possibleChars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
   let result = "";
@@ -19,4 +21,14 @@ const generateRandomString = function() {
   return result;
 };
 
-module.exports = {findUserByEmail, generateRandomString};
+// helper function to check if user is logged in 
+const checkIfLoggedIn = function(req, res, next) {
+  const user = users[req.cookies["user_id"]];
+  if (user) { // if user is logged in redirect to /urls
+    return res.redirect("/urls");
+  } else { // if user is not logged in procees to next route handler
+    next();
+  }
+};
+
+module.exports = { findUserByEmail, generateRandomString, checkIfLoggedIn };
