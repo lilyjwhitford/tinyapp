@@ -48,13 +48,14 @@ app.get("/urls/:id", (req, res) => {
 app.post("/urls", checkIfNotLoggedInForPost, (req, res) => { // making POST request to /urls
   const id = generateRandomString(); // generating random short URL/id
   const longURL = req.body.longURL; // grab longURL from form input
-  urlDatabase[id] = longURL; // save id-longURL to urlDatabse when it recieves POST request to "/urls"
+  const userID = req.cookies["user_id"]; // 
+  urlDatabase[id] = { longURL, userID }; // save id-longURL to urlDatabse when it recieves POST request to "/urls"
   res.redirect(`/urls/${id}`); // respond with redirect to /urls/id
 });
 
 app.get("/u/:id", (req, res) => {
   const id = req.params.id; // extract the id from request parameters
-  const longURL = urlDatabase[id]; // fetch longURL associated with id from urlDatabase
+  const longURL = urlDatabase[id].longURL; // fetch longURL associated with id from urlDatabase
 
   if (longURL) { // check if longURL exists in urlDatabase
     return res.redirect(302, longURL); // if it does exist, redirect to longURL using status code 302 (found)
