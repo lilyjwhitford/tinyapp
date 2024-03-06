@@ -26,9 +26,29 @@ const checkIfLoggedIn = function(req, res, next) {
   const user = users[req.cookies["user_id"]];
   if (user) { // if user is logged in redirect to /urls
     return res.redirect("/urls");
-  } else { // if user is not logged in procees to next route handler
+  } else { // if user is not logged in proceed to next route handler
     next();
   }
 };
 
-module.exports = { findUserByEmail, generateRandomString, checkIfLoggedIn };
+// helper function to check if user is logged in 
+const checkIfNotLoggedIn = function(req, res, next) {
+  const user = users[req.cookies["user_id"]];
+  if (user) { // if user is logged proceed to next route handler
+    next();
+  } else { // if user is not logged in redirect to /login
+    return res.redirect("/login");
+  }
+};
+
+// helper function to check if user is logged in 
+const checkIfNotLoggedInForPost = function(req, res, next) {
+  const user = users[req.cookies["user_id"]];
+  if (user) { // if user is logged proceed to next route handler
+    next();
+  } else { // if user is not logged in send HTML message telling the user why
+    return res.send(`<h1>You must be logged in to shorten URLs</h1>`);
+  }
+};
+
+module.exports = { findUserByEmail, generateRandomString, checkIfLoggedIn, checkIfNotLoggedIn, checkIfNotLoggedInForPost };
