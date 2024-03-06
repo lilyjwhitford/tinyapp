@@ -1,5 +1,5 @@
 const express = require("express");
-const { findUserByEmail, generateRandomString } = require("./helperFuncs");
+const { findUserByEmail, generateRandomString, checkIfLoggedIn } = require("./helperFuncs");
 const { urlDatabase, users } = require("./data");
 
 const app = express();
@@ -102,12 +102,12 @@ app.post("/logout", (req, res) => {
   res.redirect("/login"); // redirect user to home/login page
 });
 
-app.get("/register", (req, res) => {
+app.get("/register", checkIfLoggedIn, (req, res) => {
   const user = users[req.cookies["user_id"]];
   const templateVars = {
     user: user
   };
-  res.render("register", templateVars);
+  return res.render("register", templateVars);
 });
 
 app.post("/register", (req, res) => {
@@ -132,10 +132,10 @@ app.post("/register", (req, res) => {
   res.redirect("/urls"); // redirect to /urls page
 });
 
-app.get("/login", (req, res) => {
+app.get("/login", checkIfLoggedIn, (req, res) => {
   const user = users[req.cookies["user_id"]];
   const templateVars = {
   user: user
   };
-  res.render("login", templateVars);
+  return res.render("login", templateVars);
 });
