@@ -1,5 +1,5 @@
 const express = require("express");
-const { findUserByEmail, generateRandomString, checkIfLoggedIn } = require("./helperFuncs");
+const { findUserByEmail, generateRandomString, checkIfLoggedIn, checkIfNotLoggedIn, checkIfNotLoggedInForPost } = require("./helperFuncs");
 const { urlDatabase, users } = require("./data");
 
 const app = express();
@@ -27,7 +27,7 @@ app.get("/urls", (req, res) => {
   res.render("urls_index", templateVars);
 });
 
-app.get("/urls/new", (req, res) => {
+app.get("/urls/new",checkIfNotLoggedIn, (req, res) => {
   const user = users[req.cookies["user_id"]];
   const templateVars = {
     user: user
@@ -45,7 +45,7 @@ app.get("/urls/:id", (req, res) => {
   res.render("urls_show", templateVars); // render the urls_show template
 });
 
-app.post("/urls", (req, res) => { // making POST request to /urls
+app.post("/urls", checkIfNotLoggedInForPost, (req, res) => { // making POST request to /urls
   const id = generateRandomString(); // generating random short URL/id
   const longURL = req.body.longURL; // grab longURL from form input
   urlDatabase[id] = longURL; // save id-longURL to urlDatabse when it recieves POST request to "/urls"
