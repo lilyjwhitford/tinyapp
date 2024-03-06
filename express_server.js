@@ -1,5 +1,5 @@
 const express = require("express");
-const { findUserByEmail, generateRandomString, checkIfLoggedIn, checkIfNotLoggedIn, checkIfNotLoggedInForPost } = require("./helperFuncs");
+const { findUserByEmail, generateRandomString, checkIfLoggedIn, checkIfNotLoggedIn, checkIfNotLoggedInForPost, checkIfNotLoggedInForGet } = require("./helperFuncs");
 const { urlDatabase, users } = require("./data");
 
 const app = express();
@@ -18,7 +18,7 @@ app.get("/urls.json", (req, res) => {
   res.json(urlDatabase);
 });
 
-app.get("/urls", (req, res) => {
+app.get("/urls", checkIfNotLoggedInForGet, (req, res) => {
   const user = users[req.cookies["user_id"]]; // lookup user object using user_id cookie value
   const templateVars = {
     urls: urlDatabase,
@@ -75,7 +75,7 @@ app.post("/urls/:id", (req, res) => {
   const newLongURL = req.body.longURL; 
 
   if (urlDatabase[id]) { // check if shortURL id exists in database
-    urlDatabase[id] = newLongURL; // update longURL in database
+    urlDatabase[id].longURL = newLongURL; // update longURL in database
     return res.redirect("/urls"); // redirect user back to "/urls"
   } else {
     return res.status(404).send("404 Error: URL not found"); // if shortURL doesnt exist, 404 status code
