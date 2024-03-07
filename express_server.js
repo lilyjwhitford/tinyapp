@@ -6,9 +6,16 @@ const { urlDatabase, users } = require("./data");
 const app = express();
 const PORT = 8080; // default port 8080
 
+const cookieSession = require("cookie-session");
+app.use(cookieSession({
+  name: "session",
+  keys: ["superSecretKeyPleaseDontHackMe1", "superSecretKeyPleaseDontHackMe2"]
+}));
+
 app.use(express.urlencoded({ extended: true }));
-const cookieParser = require("cookie-parser");
-app.use(cookieParser());
+// const cookieParser = require("cookie-parser");
+// app.use(cookieParser());
+
 app.set('view engine', 'ejs');
 
 app.listen(PORT, () => {
@@ -20,7 +27,7 @@ app.get("/urls.json", (req, res) => {
 });
 
 app.get("/urls", checkIfNotLoggedInForGet, (req, res) => {
-  const user = users[req.cookies["user_id"]]; // lookup user object using user_id cookie value
+  const user = users[req.session.user_id]; // lookup user object using user_id cookie value
   const userUrls = urlsForUser(user.id); // use the users id from the cookie to filter URLS for the logged-in user
   const templateVars = {
     urls: userUrls, // pass filteres URLS to template
@@ -30,7 +37,7 @@ app.get("/urls", checkIfNotLoggedInForGet, (req, res) => {
 });
 
 app.get("/urls/new",checkIfNotLoggedIn, (req, res) => {
-  const user = users[req.cookies["user_id"]];
+  const user = users[req.session.user_id];
   const templateVars = {
     user: user
   };
@@ -38,7 +45,7 @@ app.get("/urls/new",checkIfNotLoggedIn, (req, res) => {
 });
 
 app.get("/urls/:id", (req, res) => {
-  const user = users[req.cookies["user_id"]];
+  const user = users[req.session.user_id];
   const templateVars = { 
     id: req.params.id, 
     longURL: urlDatabase[req.params.id],
@@ -50,7 +57,7 @@ app.get("/urls/:id", (req, res) => {
 app.post("/urls", checkIfNotLoggedInForPost, (req, res) => { // making POST request to /urls
   const id = generateRandomString(); // generating random short URL/id
   const longURL = req.body.longURL; // grab longURL from form input
-  const userId = req.cookies["user_id"]; // 
+  const userId = req.session.user_id; 
   urlDatabase[id] = { longURL, userId }; // save id-longURL to urlDatabse when it recieves POST request to "/urls"
   res.redirect(`/urls/${id}`); // respond with redirect to /urls/id
 });
@@ -95,25 +102,25 @@ app.post("/login", (req, res) => {
   const password = req.body.password;
   const user = findUserByEmail(email);
   if (!user) {
-    return res.status(403).send("403 Error: E-mail/Password cannot be found");
+    return res.status(403).send("Error 403: E-mail/Password cannot be found");
   }
   const isValidPassword = bcrypt.compareSync(password, user.password); // compare password with hashed password
 
   if (!isValidPassword) { // check if password is correct
-    return res.status(403).send("403 Error: E-mail and Password do not match");
+    return res.status(403).send("Error 403: E-mail and Password do not match");
   }
   
-  res.cookie("user_id", user.id); // if password is correct, proceed with login
+  req.session.user_id = user.id; // if password is correct, proceed with login
   return res.redirect("/urls"); // redirect user to home/login page
 });
 
 app.post("/logout", (req, res) => {
-  res.clearCookie("user_id"); // clear "user_id" cookie to log user out
+  req.session = null; // clear "user_id" cookie to log user out
   res.redirect("/login"); // redirect user to home/login page
 });
 
 app.get("/register", checkIfLoggedIn, (req, res) => {
-  const user = users[req.cookies["user_id"]];
+  const user = users[req.session.user_id];
   const templateVars = {
     user: user
   };
@@ -126,10 +133,10 @@ app.post("/register", (req, res) => {
   const hashedPassword = bcrypt.hashSync(password, 10);
   const existingUser = findUserByEmail(email);
   if (email === "" || password === "") {
-    return res.status(400).send("400 Error: E-mail/Password cannot be empty");
+    return res.status(400).send("Error 400: E-mail/Password cannot be empty");
   } // if password/email fields are empty, return 404 status code
   if (existingUser) {
-    return res.status(400).send("400 Error: E-mail already in use");
+    return res.status(400).send("Error 400: E-mail already in use");
   } // if email is already in use, return 404 status code
   const userId = generateRandomString(); // generate random userID
   const newUser = { // extract email and password from req.body
@@ -139,12 +146,12 @@ app.post("/register", (req, res) => {
   };
   users[userId] = newUser; // add new user to users object
   
-  res.cookie("user_id", userId); // set user_id cookie
+  req.session.user_id = userId; // set user_id cookie
   res.redirect("/urls"); // redirect to /urls page
 });
 
 app.get("/login", checkIfLoggedIn, (req, res) => {
-  const user = users[req.cookies["user_id"]];
+  const user = users[req.session.user_id];
   const templateVars = {
   user: user
   };

@@ -23,7 +23,7 @@ const generateRandomString = function() {
 
 // helper function to check if user is logged in 
 const checkIfLoggedIn = function(req, res, next) {
-  const user = users[req.cookies["user_id"]];
+  const user = users[req.session.user_id];
   if (user) { // if user is logged in redirect to /urls
     return res.redirect("/urls");
   } else { // if user is not logged in proceed to next route handler
@@ -33,7 +33,7 @@ const checkIfLoggedIn = function(req, res, next) {
 
 // helper function to check if user is logged in 
 const checkIfNotLoggedIn = function(req, res, next) {
-  const user = users[req.cookies["user_id"]];
+  const user = users[req.session.user_id];
   if (user) { // if user is logged proceed to next route handler
     next();
   } else { // if user is not logged in redirect to /login
@@ -43,7 +43,7 @@ const checkIfNotLoggedIn = function(req, res, next) {
 
 // helper function to check if user is logged in to POST /urls and returns appropriate message
 const checkIfNotLoggedInForPost = function(req, res, next) {
-  const user = users[req.cookies["user_id"]];
+  const user = users[req.session.user_id];
   if (user) { // if user is logged proceed to next route handler
     next();
   } else { // if user is not logged in send HTML message telling the user to login/register
@@ -52,7 +52,7 @@ const checkIfNotLoggedInForPost = function(req, res, next) {
 };
 // helper function to check if user is logged in to GET /urls and returns appropriate message
 const checkIfNotLoggedInForGet = function(req, res, next) {
-  const user = users[req.cookies["user_id"]];
+  const user = users[req.session.user_id];
   if (user) { // if user is logged proceed to next route handler
     next();
   } else { // if user is not logged in send HTML message telling the to login/register
@@ -72,7 +72,7 @@ const urlsForUser = function(id){
 };
 // helper function to check if user is logged in on GET /urls/:id
 const checkIfNotLoggedInId = function(req, res, next) {
-  const user = users[req.cookies["user_id"]];
+  const user = users[req.session.user_id];
   if (user) { // if user is logged proceed to next route handler
     next();
   } else { // if user is not logged in return message to register/login
@@ -82,7 +82,7 @@ const checkIfNotLoggedInId = function(req, res, next) {
 
 // helper function to check if logged in user owns URL
 const checkUrlOwnership = function(req, res, next) {
-  const user = users[req.cookies["user_id"]];
+  const user = users[req.session.user_id];
   const urlId = req.params.id;
   const urlInfo = urlDatabase[urlId];
   if (urlInfo && urlInfo.userId === user.id) {
