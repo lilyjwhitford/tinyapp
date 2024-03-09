@@ -6,9 +6,6 @@ const getUserByEmail = function(email, database) { // helper function that takes
     if (database[userId].email === email) {
       return database[userId].id // returns the entire user object
     }
-    if (database[userId].email !== email) {
-      return undefined;
-    }
   }
   return null; // returns null if not found
 };
@@ -25,7 +22,7 @@ const generateRandomString = function() {
 };
 
 // helper function to check if user is logged in 
-const checkIfLoggedIn = function(req, res, next) {
+const checkIfLoggedIn = function(req, res, next, users) {
   const user = users[req.session.user_id];
   if (user) { // if user is logged in redirect to /urls
     return res.redirect("/urls");
@@ -35,7 +32,7 @@ const checkIfLoggedIn = function(req, res, next) {
 };
 
 // helper function to check if user is logged in 
-const checkIfNotLoggedIn = function(req, res, next) {
+const checkIfNotLoggedIn = function(req, res, next, users) {
   const user = users[req.session.user_id];
   if (user) { // if user is logged proceed to next route handler
     next();
@@ -65,13 +62,13 @@ const checkIfNotLoggedInForGet = function(req, res, next) {
 
 // helper function that returns URL where userID is equal to the if of user
 const urlsForUser = function(id){
-  const userUrls = []; // initialize empty array to store URLS for specific user
+  const userUrls = {}; // initialize empty object to store URLS for specific user
   for (let shortURL in urlDatabase) { // iterate over each entry in urlDatabase
     if (urlDatabase[shortURL].userId === id) { // check if userID of current URL matches provided id
-      userUrls.push(urlDatabase[shortURL].longURL) // if it matches, add longURL to new array
+      userUrls[shortURL] = (urlDatabase[shortURL].longURL) // if it matches, add longURL to new array
     }
   }
-  return userUrls; // return array or URLS for specific user
+  return userUrls; // return object of URLS for specific user
 };
 // helper function to check if user is logged in on GET /urls/:id
 const checkIfNotLoggedInId = function(req, res, next) {
