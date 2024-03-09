@@ -1,10 +1,13 @@
 const { users, urlDatabase } = require("./data");
 
 // helper function to find user by email
-const findUserByEmail = function(email) { // helper function that takes in email 
-  for (let userId in users) {
-    if (users[userId].email === email) {
-      return users[userId] // returns the entire user object
+const getUserByEmail = function(email, database) { // helper function that takes in email 
+  for (const userId in database) {
+    if (database[userId].email === email) {
+      return database[userId].id // returns the entire user object
+    }
+    if (database[userId].email !== email) {
+      return undefined;
     }
   }
   return null; // returns null if not found
@@ -93,7 +96,7 @@ const checkUrlOwnership = function(req, res, next) {
 };
 
 module.exports = { 
-  findUserByEmail, 
+  getUserByEmail, 
   generateRandomString, 
   checkIfLoggedIn, 
   checkIfNotLoggedIn, 

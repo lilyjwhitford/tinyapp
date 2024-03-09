@@ -1,6 +1,6 @@
 const express = require("express");
 const bcrypt = require("bcryptjs");
-const { findUserByEmail, generateRandomString, checkIfLoggedIn, checkIfNotLoggedIn, checkIfNotLoggedInForPost, checkIfNotLoggedInForGet, urlsForUser, checkIfNotLoggedInId, checkUrlOwnership } = require("./helperFuncs");
+const { getUserByEmail, generateRandomString, checkIfLoggedIn, checkIfNotLoggedIn, checkIfNotLoggedInForPost, checkIfNotLoggedInForGet, urlsForUser, checkIfNotLoggedInId, checkUrlOwnership } = require("./helpers");
 const { urlDatabase, users } = require("./data");
 
 const app = express();
@@ -100,7 +100,7 @@ app.post("/urls/:id", checkIfNotLoggedInId, checkUrlOwnership, (req, res) => {
 app.post("/login", (req, res) => {
   const email = req.body.email;
   const password = req.body.password;
-  const user = findUserByEmail(email);
+  const user = getUserByEmail(email);
   if (!user) {
     return res.status(403).send("Error 403: E-mail/Password cannot be found");
   }
@@ -131,7 +131,7 @@ app.post("/register", (req, res) => {
   const email = req.body.email;
   const password = req.body.password;
   const hashedPassword = bcrypt.hashSync(password, 10);
-  const existingUser = findUserByEmail(email);
+  const existingUser = getUserByEmail(email);
   if (email === "" || password === "") {
     return res.status(400).send("Error 400: E-mail/Password cannot be empty");
   } // if password/email fields are empty, return 404 status code
