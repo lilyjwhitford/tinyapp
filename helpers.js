@@ -4,7 +4,7 @@ const { users, urlDatabase } = require("./data");
 const getUserByEmail = function(email, database) { // helper function that takes in email 
   for (const userId in database) {
     if (database[userId].email === email) {
-      return database[userId].id // returns the entire user object
+      return database[userId] // returns the entire user object
     }
   }
   return null; // returns null if not found
