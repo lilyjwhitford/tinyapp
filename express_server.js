@@ -13,8 +13,7 @@ app.use(cookieSession({
 }));
 
 app.use(express.urlencoded({ extended: true }));
-// const cookieParser = require("cookie-parser");
-// app.use(cookieParser());
+app.use(express.json());
 
 app.set('view engine', 'ejs');
 
