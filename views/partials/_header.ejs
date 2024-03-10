@@ -19,8 +19,8 @@
       </div>
     </div>
     <% if (user) { %>
-      <span>Logged in as: <%= user.email %>
-      <form method="POST" action="/logout" class="d-flex justify-content-between">
+      <form method="POST" action="/logout" class="d-flex">
+      <label for="user" class="col-form-label">Logged in as: <%= user.email %></label>
         <button type="submit" class="btn btn-primary">Logout</button>
       </form>
     <% } else { %>
