@@ -98,12 +98,13 @@ app.get("/urls/:id", (req, res) => {
 // route to redirect to long URL if it exists
 app.get("/u/:id", (req, res) => {
   const id = req.params.id;
-  const longURL = urlDatabase[id].longURL; // fetch longURL associated with id from urlDatabase
+  const longURLObject = urlDatabase[id]; // fetch longURL associated with id from urlDatabase
 
-  if (longURL) { // check if longURL exists in urlDatabase
-    return res.redirect(longURL);
+  if (!longURLObject || !longURLObject.longURL) { // check if longURL exists in urlDatabase
+    return res.status(404).send(`<h1>Error 404: URL Not Found.</h1>`);
   }
-  res.status(404).send(`<h1> Error 404: URL Not Found.<h1>`);
+  const longURL = longURLObject.longURL; // Extract the long URL from the entry
+  res.redirect(longURL); // Redirect to the long URL
 });
 
 // route to delete a URL if the user is logged in and owns the URL
