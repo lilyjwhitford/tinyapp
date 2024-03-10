@@ -1,10 +1,10 @@
 const { users, urlDatabase } = require("./data");
 
 // helper function to find user by email
-const getUserByEmail = function(email, database) { // helper function that takes in email 
+const getUserByEmail = function(email, database) { // helper function that takes in email
   for (const userId in database) {
     if (database[userId].email === email) {
-      return database[userId] // returns the entire user object
+      return database[userId]; // returns the entire user object
     }
   }
   return null; // returns null if not found
@@ -22,17 +22,17 @@ const generateRandomString = function() {
 };
 
 // helper function that returns URL where userID is equal to the if of user
-const urlsForUser = function(id){
+const urlsForUser = function(id) {
   const userUrls = {}; // initialize empty object to store URLS for specific user
   for (let shortURL in urlDatabase) { // iterate over each entry in urlDatabase
     if (urlDatabase[shortURL].userId === id) { // check if userID of current URL matches provided id
-      userUrls[shortURL] = (urlDatabase[shortURL].longURL) // if it matches, add longURL to new array
+      userUrls[shortURL] = (urlDatabase[shortURL].longURL); // if it matches, add longURL to new array
     }
   }
   return userUrls; // return object of URLS for specific user
 };
 
-module.exports = { 
-  getUserByEmail, 
-  generateRandomString, 
+module.exports = {
+  getUserByEmail,
+  generateRandomString,
   urlsForUser };
