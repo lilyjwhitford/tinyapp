@@ -21,45 +21,6 @@ const generateRandomString = function() {
   return result;
 };
 
-// helper function to check if user is logged in 
-const checkIfLoggedIn = function(req, res, next, users) {
-  const user = users[req.session.user_id];
-  if (user) { // if user is logged in redirect to /urls
-    return res.redirect("/urls");
-  } else { // if user is not logged in proceed to next route handler
-    next();
-  }
-};
-
-// helper function to check if user is logged in 
-const checkIfNotLoggedIn = function(req, res, next, users) {
-  const user = users[req.session.user_id];
-  if (user) { // if user is logged proceed to next route handler
-    next();
-  } else { // if user is not logged in redirect to /login
-    return res.redirect("/login");
-  }
-};
-
-// helper function to check if user is logged in to POST /urls and returns appropriate message
-const checkIfNotLoggedInForPost = function(req, res, next) {
-  const user = users[req.session.user_id];
-  if (user) { // if user is logged proceed to next route handler
-    next();
-  } else { // if user is not logged in send HTML message telling the user to login/register
-    return res.send(`<h1>You must be logged in to shorten URLs. Please <a href="/login">login</a> or <a href="/register">register.<h1>`);
-  }
-};
-// helper function to check if user is logged in to GET /urls and returns appropriate message
-const checkIfNotLoggedInForGet = function(req, res, next) {
-  const user = users[req.session.user_id];
-  if (user) { // if user is logged proceed to next route handler
-    next();
-  } else { // if user is not logged in send HTML message telling the to login/register
-    return res.send(`<h1>You must be logged in to view shortened URLs. Please <a href="/login">login</a> or <a href="/register">register.<h1>`);
-  }
-};
-
 // helper function that returns URL where userID is equal to the if of user
 const urlsForUser = function(id){
   const userUrls = {}; // initialize empty object to store URLS for specific user
@@ -70,35 +31,8 @@ const urlsForUser = function(id){
   }
   return userUrls; // return object of URLS for specific user
 };
-// helper function to check if user is logged in on GET /urls/:id
-const checkIfNotLoggedInId = function(req, res, next) {
-  const user = users[req.session.user_id];
-  if (user) { // if user is logged proceed to next route handler
-    next();
-  } else { // if user is not logged in return message to register/login
-    return res.status(403).send(`<h1>You cannot access this page if you are not logged in. Please <a href="/login">login</a> or <a href="/register">register.<h1>`);
-  }
-};
-
-// helper function to check if logged in user owns URL
-const checkUrlOwnership = function(req, res, next) {
-  const user = users[req.session.user_id];
-  const urlId = req.params.id;
-  const urlInfo = urlDatabase[urlId];
-  if (urlInfo && urlInfo.userId === user.id) {
-    next();
-  } else {
-    res.status(403).send(`<h1>Access Denied: You do not own this URL.<h1>`)
-  }
-};
 
 module.exports = { 
   getUserByEmail, 
   generateRandomString, 
-  checkIfLoggedIn, 
-  checkIfNotLoggedIn, 
-  checkIfNotLoggedInForPost,
-  checkIfNotLoggedInForGet,
-  urlsForUser,
-  checkIfNotLoggedInId,
-  checkUrlOwnership };
+  urlsForUser };
