@@ -8,13 +8,13 @@ const { urlDatabase, users } = require("./data");
 const app = express();
 
 // default port 8080
-const PORT = 8080; 
+const PORT = 8080;
 
 // use middleware to parse cookies
 app.use(cookieSession({
   name: "session",
   keys: ["superSecretKeyPleaseDontHackMe1", "superSecretKeyPleaseDontHackMe2"]
-  })
+})
 );
 
 // middleware to parse URL-encoded bodies
@@ -50,7 +50,7 @@ app.get("/urls", (req, res) => {
 
   const templateVars = {
     urls: userUrls,
-    user: user 
+    user: user
   };
   res.render("urls_index", templateVars);
 });
@@ -64,7 +64,7 @@ app.post("/urls", (req, res) => {
     const id = generateRandomString();
     const longURL = req.body.longURL;
     urlDatabase[id] = { longURL: longURL, userId: user.id};
-  res.redirect(`/urls/${id}`);
+    res.redirect(`/urls/${id}`);
   }
 });
 
@@ -82,16 +82,16 @@ app.get("/urls/:id", (req, res) => {
   const user = users[req.session.user_id];
   const longURL = urlDatabase[req.params.id].longURL;
   if (!longURL) {
-    return res.status(404).send(`<h1>Error 404: URL Not Found</h1>`)
+    return res.status(404).send(`<h1>Error 404: URL Not Found</h1>`);
   }
   if (!user || urlDatabase[req.params.id].userId !== user.id) {
     return res.status(403).send("<h1>Error 403: You do not have access URL.</h1>");
   }
-  const templateVars = { 
-    id: req.params.id, 
+  const templateVars = {
+    id: req.params.id,
     longURL: longURL,
     user: user
-  }; 
+  };
   res.render("urls_show", templateVars);
 });
 
@@ -154,11 +154,11 @@ app.post("/urls/:id", (req, res) => {
 app.get("/login", (req, res) => {
   const user = users[req.session.user_id];
   const templateVars = {
-  user: user
+    user: user
   };
-  if (user) { 
+  if (user) {
     res.redirect("/urls");
-  } else { 
+  } else {
     res.render("login", templateVars);
   }
 });
@@ -191,9 +191,9 @@ app.get("/register", (req, res) => {
   const templateVars = {
     user: user
   };
-  if (user) { 
+  if (user) {
     res.redirect("/urls");
-  } else { 
+  } else {
     res.render("register", templateVars);
   }
 });
