@@ -1,4 +1,4 @@
-const { users, urlDatabase } = require("./data");
+const { urlDatabase } = require("./data");
 
 // helper function to find user by email
 const getUserByEmail = function(email, database) { // helper function that takes in email
