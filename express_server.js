@@ -26,8 +26,12 @@ app.use(express.json());
 app.set('view engine', 'ejs');
 
 app.get("/", (req, res) => {
-  res.redirect("/login");
-})
+  const user = users[req.session.user_id];
+  if (!user) {
+    return res.redirect("/login");
+  }
+  res.redirect("/urls");
+});
 
 app.get("/urls.json", (req, res) => {
   res.json(urlDatabase);
@@ -40,7 +44,7 @@ app.get("/urls", (req, res) => {
   }
   
   const userUrls = urlsForUser(user.id); // use the users id from the cookie to filter URLS for the logged-in user
-  
+
   const templateVars = {
     urls: userUrls, // pass filteres URLS to template
     user: user // pass entire user object via templateVars
@@ -62,23 +66,26 @@ app.post("/urls", (req, res) => { // making POST request to /urls
 
 app.get("/urls/new", (req, res) => {
   const user = users[req.session.user_id];
-  const templateVars = {
-    user: user
-  };
   if (!user) {
-    res.redirect("/login");
-  } else {
-    res.render("urls_new", templateVars);
+    return res.redirect("/login");
   }
+  res.render("urls_new", { user: user });
 });
 
 app.get("/urls/:id", (req, res) => {
   const user = users[req.session.user_id];
+  longURL = urlDatabase[req.params.id];
+  if (!longURL) {
+    return res.status(404).send(`<h1>Error 404: URL Not Found</h1>`)
+  }
+  if (!user || longURL.userId !== user.id) {
+    return res.status(403).send("<h1>Error 403: You do not have access URL.</h1>");
+  }
   const templateVars = { 
     id: req.params.id, 
     longURL: urlDatabase[req.params.id],
     user: user
-  }; // pass both values to the template
+  }; 
   res.render("urls_show", templateVars); // render the urls_show template
 });
 
@@ -89,9 +96,8 @@ app.get("/u/:id", (req, res) => {
 
   if (longURL) { // check if longURL exists in urlDatabase
     return res.redirect(longURL); // if it does exist, redirect to longURL using status code 302 (found)
-  } else {
-    return res.status(404).send(`<h1> Error 404: URL Not Found.<h1>`); // if longURL doesnt exist in urlDatabase, send 404 status code
   }
+  res.status(404).send(`<h1> Error 404: URL Not Found.<h1>`); // if longURL doesnt exist in urlDatabase, send 404 status code
 });
 
 app.post("/urls/:id/delete", (req, res) => {
@@ -150,16 +156,20 @@ app.get("/login", (req, res) => {
 app.post("/login", (req, res) => {
   const email = req.body.email;
   const password = req.body.password;
+  console.log("Email:", email); // Add this line for debugging
   const user = getUserByEmail(email);
-  if (!user) {
-    return res.status(403).send("Error 403: E-mail/Password cannot be found");
-  }
-  const isValidPassword = bcrypt.compareSync(password, user.password); // compare password with hashed password
 
-  if (!isValidPassword) { // check if password is correct
-    return res.status(403).send("Error 403: E-mail and Password do not match");
+  console.log("User:", user); // Add this line for debugging
+  if (!user) {
+    console.log("User not found."); // Add this line for debugging
+    return res.status(403).send("Error 403: E-mail/Password cannot be found.");
   }
-  
+
+  const isValidPassword = bcrypt.compareSync(password, user.password); // compare password with hashed password
+  if (!isValidPassword) { // check if password is correct
+    return res.status(403).send("Error 403: E-mail and Password do not match.");
+  }
+
   req.session.user_id = user.id; // if password is correct, proceed with login
   return res.redirect("/urls");
 });
@@ -186,21 +196,24 @@ app.post("/register", (req, res) => {
   const password = req.body.password;
   const hashedPassword = bcrypt.hashSync(password, 10);
   const existingUser = getUserByEmail(email);
+
   if (!email || !password) {
-    return res.status(400).send("Error 400: E-mail/Password cannot be empty");
+    return res.status(400).send("Error 400: E-mail/Password cannot be empty.");
   } // if password/email fields are empty, return 404 status code
+
   if (existingUser) {
-    return res.status(400).send("Error 400: E-mail already in use");
+    return res.status(400).send("Error 400: E-mail already in use.");
   } // if email is already in use, return 404 status code
+
   const userId = generateRandomString(); // generate random userID
   const newUser = { // extract email and password from req.body
     id: userId,
-    email: req.body.email,
+    email: email,
     password: hashedPassword // store hashed password
   };
   users[userId] = newUser; // add new user to users object
-  
   req.session.user_id = userId; // set user_id cookie
+
   res.redirect("/urls"); // redirect to /urls page
 });
 
