@@ -26,7 +26,7 @@ const urlsForUser = function(id) {
   const userUrls = {}; // initialize empty object to store URLS for specific user
   for (let shortURL in urlDatabase) { // iterate over each entry in urlDatabase
     if (urlDatabase[shortURL].userId === id) { // check if userID of current URL matches provided id
-      userUrls[shortURL] = (urlDatabase[shortURL].longURL); // if it matches, add longURL to new array
+      userUrls[shortURL] = urlDatabase[shortURL]; // if it matches, add longURL to new array
     }
   }
   return userUrls; // return object of URLS for specific user

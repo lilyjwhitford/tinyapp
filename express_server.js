@@ -98,20 +98,19 @@ app.get("/urls/:id", (req, res) => {
 // route to redirect to long URL if it exists
 app.get("/u/:id", (req, res) => {
   const id = req.params.id;
-  const longURLObject = urlDatabase[id]; // fetch longURL associated with id from urlDatabase
+  const longURLObject = urlDatabase[id];
 
-  if (!longURLObject || !longURLObject.longURL) { // check if longURL exists in urlDatabase
+  if (!longURLObject || !longURLObject.longURL) {
     return res.status(404).send(`<h1>Error 404: URL Not Found.</h1>`);
   }
-  const longURL = longURLObject.longURL; // Extract the long URL from the entry
-  res.redirect(longURL); // Redirect to the long URL
+  const longURL = longURLObject.longURL;
+  res.redirect(longURL);
 });
 
 // route to delete a URL if the user is logged in and owns the URL
 app.post("/urls/:id/delete", (req, res) => {
   const userId = req.session.user_id;
-  const id = req.params.id; // extract the id from request parameters
-  //check if URL id exists in database
+  const id = req.params.id;
   if (!urlDatabase[id]) {
     res.status(404).send(`<h1>Error 404: URL Not Found.</h1>`);
   }
@@ -133,19 +132,19 @@ app.post("/urls/:id", (req, res) => {
   const userId = req.session.user_id;
   const id = req.params.id;
   const newLongURL = req.body.longURL;
-  // check if URL if exists in the database
+
   if (!urlDatabase[id]) {
     return res.status(404).send(`<h1>Error 404: URL Not Found.</h1>`);
   }
-  // check if user is logged in
+
   if (!userId) {
     return res.status(403).send(`<h1>Error 403: You are not logged in. Please <a href="/login">login</a> or <a href="/register">register.<h1>`);
   }
-  // check if user owns the URL
+  
   if (urlDatabase[id].userId !== userId) {
     return res.status(401).send(`<h1>Error 401: You do not own this URL.</h1>`);
   }
-  // if no errors occur update longURL property in database
+
   urlDatabase[id].longURL = newLongURL;
   return res.redirect("/urls");
 });
@@ -207,11 +206,11 @@ app.post("/register", (req, res) => {
 
   if (!email || !password) {
     return res.status(400).send("Error 400: E-mail/Password cannot be empty.");
-  } // if password/email fields are empty, return 404 status code
+  }
 
   if (existingUser) {
     return res.status(400).send("Error 400: E-mail already in use.");
-  } // if email is already in use, return 404 status code
+  }
 
   const userId = generateRandomString();
   const newUser = {
