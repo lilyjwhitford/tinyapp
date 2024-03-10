@@ -80,16 +80,16 @@ app.get("/urls/new", (req, res) => {
 // route to display URLs for the given ID if user is logged in and owns the URL
 app.get("/urls/:id", (req, res) => {
   const user = users[req.session.user_id];
-  longURL = urlDatabase[req.params.id];
+  const longURL = urlDatabase[req.params.id].longURL;
   if (!longURL) {
     return res.status(404).send(`<h1>Error 404: URL Not Found</h1>`)
   }
-  if (!user || longURL.userId !== user.id) {
+  if (!user || urlDatabase[req.params.id].userId !== user.id) {
     return res.status(403).send("<h1>Error 403: You do not have access URL.</h1>");
   }
   const templateVars = { 
     id: req.params.id, 
-    longURL: urlDatabase[req.params.id],
+    longURL: longURL,
     user: user
   }; 
   res.render("urls_show", templateVars);
