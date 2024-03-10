@@ -25,6 +25,7 @@ app.use(express.json());
 // set EJS as templating engine
 app.set('view engine', 'ejs');
 
+// route to home page
 app.get("/", (req, res) => {
   const user = users[req.session.user_id];
   if (!user) {
@@ -33,37 +34,41 @@ app.get("/", (req, res) => {
   res.redirect("/urls");
 });
 
+// route to display URLs in json format
 app.get("/urls.json", (req, res) => {
   res.json(urlDatabase);
 });
 
+// route to display URLs, rendering URLs for logged-in user
 app.get("/urls", (req, res) => {
-  const user = users[req.session.user_id]; // lookup user object using user_id cookie value
+  const user = users[req.session.user_id];
   if (!user) {
     res.status(401).send(`<h1>You must be logged in to view shortened URLs. Please <a href="/login">login</a> or <a href="/register">register.<h1>`);
   }
   
-  const userUrls = urlsForUser(user.id); // use the users id from the cookie to filter URLS for the logged-in user
+  const userUrls = urlsForUser(user.id);
 
   const templateVars = {
-    urls: userUrls, // pass filteres URLS to template
-    user: user // pass entire user object via templateVars
+    urls: userUrls,
+    user: user 
   };
-  res.render("urls_index", templateVars); // render urls_index template with provided template vars
+  res.render("urls_index", templateVars);
 });
 
-app.post("/urls", (req, res) => { // making POST request to /urls
+// route for creating new URLs, creates new short URL for logged-in user
+app.post("/urls", (req, res) => {
   const user = users[req.session.user_id];
   if (!user) {
     res.status(401).send(`<h1>You must be logged in to shorten URLs. Please <a href="/login">login</a> or <a href="/register">register.<h1>`);
   } else {
-    const id = generateRandomString(); // generating random short URL/id
-    const longURL = req.body.longURL; // grab longURL from form input
-    urlDatabase[id] = { longURL: longURL, userId: user.id}; // save id-longURL to urlDatabse when it recieves POST request to "/urls"
-  res.redirect(`/urls/${id}`); // respond with redirect to /urls/id
+    const id = generateRandomString();
+    const longURL = req.body.longURL;
+    urlDatabase[id] = { longURL: longURL, userId: user.id};
+  res.redirect(`/urls/${id}`);
   }
 });
 
+// route to display page for creating new short URL
 app.get("/urls/new", (req, res) => {
   const user = users[req.session.user_id];
   if (!user) {
@@ -72,6 +77,7 @@ app.get("/urls/new", (req, res) => {
   res.render("urls_new", { user: user });
 });
 
+// route to display URLs for the given ID if user is logged in and owns the URL
 app.get("/urls/:id", (req, res) => {
   const user = users[req.session.user_id];
   longURL = urlDatabase[req.params.id];
@@ -86,20 +92,21 @@ app.get("/urls/:id", (req, res) => {
     longURL: urlDatabase[req.params.id],
     user: user
   }; 
-  res.render("urls_show", templateVars); // render the urls_show template
+  res.render("urls_show", templateVars);
 });
 
-
+// route to redirect to long URL if it exists
 app.get("/u/:id", (req, res) => {
-  const id = req.params.id; // extract the id from request parameters
+  const id = req.params.id;
   const longURL = urlDatabase[id].longURL; // fetch longURL associated with id from urlDatabase
 
   if (longURL) { // check if longURL exists in urlDatabase
-    return res.redirect(longURL); // if it does exist, redirect to longURL using status code 302 (found)
+    return res.redirect(longURL);
   }
-  res.status(404).send(`<h1> Error 404: URL Not Found.<h1>`); // if longURL doesnt exist in urlDatabase, send 404 status code
+  res.status(404).send(`<h1> Error 404: URL Not Found.<h1>`);
 });
 
+// route to delete a URL if the user is logged in and owns the URL
 app.post("/urls/:id/delete", (req, res) => {
   const userId = req.session.user_id;
   const id = req.params.id; // extract the id from request parameters
@@ -120,6 +127,7 @@ app.post("/urls/:id/delete", (req, res) => {
   res.redirect("/urls"); // once its deleted. redirect user back to "/urls"
 });
 
+// route to update a URL if user if logged in and owns the URL
 app.post("/urls/:id", (req, res) => {
   const userId = req.session.user_id;
   const id = req.params.id;
@@ -141,6 +149,7 @@ app.post("/urls/:id", (req, res) => {
   return res.redirect("/urls");
 });
 
+// route to display login page. redirects to "/urls" if user is logged in
 app.get("/login", (req, res) => {
   const user = users[req.session.user_id];
   const templateVars = {
@@ -153,32 +162,31 @@ app.get("/login", (req, res) => {
   }
 });
 
+// route to handle user login if email/password are correct
 app.post("/login", (req, res) => {
   const email = req.body.email;
   const password = req.body.password;
-  console.log("Email:", email); // Add this line for debugging
   const user = getUserByEmail(email);
 
-  console.log("User:", user); // Add this line for debugging
   if (!user) {
-    console.log("User not found."); // Add this line for debugging
     return res.status(403).send("Error 403: E-mail/Password cannot be found.");
   }
 
-  const isValidPassword = bcrypt.compareSync(password, user.password); // compare password with hashed password
-  if (!isValidPassword) { // check if password is correct
+  const isValidPassword = bcrypt.compareSync(password, user.password);
+  if (!isValidPassword) {
     return res.status(403).send("Error 403: E-mail and Password do not match.");
   }
 
-  req.session.user_id = user.id; // if password is correct, proceed with login
-  return res.redirect("/urls");
+  req.session.user_id = user.id;
 });
 
+// route to log user out
 app.post("/logout", (req, res) => {
   req.session = null; // clears session
   res.redirect("/login");
 });
 
+// route to render registration page
 app.get("/register", (req, res) => {
   const user = users[req.session.user_id];
   const templateVars = {
@@ -191,6 +199,7 @@ app.get("/register", (req, res) => {
   }
 });
 
+// route to handle user registration
 app.post("/register", (req, res) => {
   const email = req.body.email;
   const password = req.body.password;
@@ -205,16 +214,16 @@ app.post("/register", (req, res) => {
     return res.status(400).send("Error 400: E-mail already in use.");
   } // if email is already in use, return 404 status code
 
-  const userId = generateRandomString(); // generate random userID
-  const newUser = { // extract email and password from req.body
+  const userId = generateRandomString();
+  const newUser = {
     id: userId,
     email: email,
-    password: hashedPassword // store hashed password
+    password: hashedPassword
   };
-  users[userId] = newUser; // add new user to users object
-  req.session.user_id = userId; // set user_id cookie
+  users[userId] = newUser;
+  req.session.user_id = userId;
 
-  res.redirect("/urls"); // redirect to /urls page
+  res.redirect("/urls");
 });
 
 app.listen(PORT, () => {
