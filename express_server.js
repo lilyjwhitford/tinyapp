@@ -166,18 +166,16 @@ app.get("/login", (req, res) => {
 app.post("/login", (req, res) => {
   const email = req.body.email;
   const password = req.body.password;
-  const user = getUserByEmail(email);
+  const user = getUserByEmail(email, users);
 
-  if (!user) {
+  if (user === null || bcrypt.compareSync(password, user.password) === false) {
     return res.status(403).send("Error 403: E-mail/Password cannot be found.");
   }
-
-  const isValidPassword = bcrypt.compareSync(password, user.password);
-  if (!isValidPassword) {
-    return res.status(403).send("Error 403: E-mail and Password do not match.");
+  
+  if (user !== null && bcrypt.compareSync(password, user.password) === true) {
+    req.session.user_id = user.id;
+    return res.redirect("/urls");
   }
-
-  req.session.user_id = user.id;
 });
 
 // route to log user out
